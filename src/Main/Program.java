@@ -37,7 +37,7 @@ public class Program {
         ConsumerGroup consumerGroup = new ConsumerGroup(messageBroker, topicName, consumerGroupName, consumerGroupFile, numberOfConsumers);
 
         producerGroup.start();
-        consumerGroup.start();
+       // consumerGroup.start();
 
         while(producerGroup.isAlive() || consumerGroup.isAlive()) {
             try {

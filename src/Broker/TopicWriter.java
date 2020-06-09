@@ -1,5 +1,9 @@
 package Broker;
 
+import Logger.Logger;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 
@@ -8,10 +12,12 @@ public class TopicWriter {
 
     private Topic topic;
     private HashMap<String, Transaction> transactions;
+    private String key = "";
 
-    TopicWriter(Topic topic) {
+    TopicWriter(Topic topic) throws FileNotFoundException {
         this.topic=topic;
         transactions = new HashMap<>();
+        buffer = new RandomAccessFile(topic.getTopicFile(), "rw");
     }
 
     public void put(String producerName, int value) {
@@ -41,7 +47,9 @@ public class TopicWriter {
             transactions.get(producerName).put(value);
         }
         else {
-            writeValue(value);
+            synchronized (key){
+                writeValue(value);
+            }
         }
     }
 
@@ -56,8 +64,9 @@ public class TopicWriter {
     private void startTransaction(String producerName) {
         if(transactions.containsKey(producerName)) {
             //To Do - Log the problem in finalizing previous transaction.
+            Logger logger = new Logger("");
+            logger.run();
             commitTransaction(producerName);
-            transactions.remove(producerName);
         }
         addTransaction(producerName);
     }
@@ -68,10 +77,15 @@ public class TopicWriter {
      */
     private void commitTransaction(String producerName) {
         if(transactions.containsKey(producerName)) {
-            transactions.get(producerName).commit();
+            synchronized (key){
+                transactions.get(producerName).commit();
+                transactions.remove(producerName) ;
+            }
         }
         else {
             //To Do - Log the problem in committing a non-existing transaction.
+            Logger logger = new Logger("");
+            logger.run();
         }
     }
 
@@ -85,10 +99,17 @@ public class TopicWriter {
         }
         else {
             //To Do - Log the problem in canceling a non-existing transaction.
+            Logger logger = new Logger("");
+            logger.run();
         }
     }
 
     public void writeValue(int value) {
         //To Do - Put the given value at the end of the topicFile
+        try {
+            buffer.writeInt(value);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

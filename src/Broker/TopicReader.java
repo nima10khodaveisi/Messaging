@@ -1,5 +1,6 @@
 package Broker;
 
+import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
 public class TopicReader {
@@ -9,10 +10,10 @@ public class TopicReader {
     private Topic topic;
     private String groupName;
 
-    TopicReader(Topic topic, String groupName) {
+    TopicReader(Topic topic, String groupName) throws FileNotFoundException {
         this.topic = topic;
         this.groupName=groupName;
-        //To Do - Generate topicFile
+        topicFile = new RandomAccessFile(topic.getTopicFile(), "r"):
     }
 
     public int get(String consumerName) {

@@ -1,6 +1,9 @@
 package Broker;
 
+import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Topic {
@@ -10,7 +13,7 @@ public class Topic {
     private TopicWriter topicWriter;
     private HashMap<String, TopicReader> topicReaders;
 
-    Topic(String name) {
+    Topic(String name) throws FileNotFoundException {
         this.name = name;
 
         topicFile = new File(name + ".dat");
@@ -31,8 +34,10 @@ public class Topic {
      * @return the value of the first remained item.
      */
     public int get(String groupName, String consumerName) {
-        if(!topicReaders.containsKey(groupName)) {
-            addGroup(groupName);
+        synchronized (Color.RED){
+            if(!topicReaders.containsKey(groupName)) {
+                addGroup(groupName);
+            }
         }
 
         return topicReaders.get(groupName).get(consumerName);
